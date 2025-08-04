@@ -15,11 +15,11 @@ const todoSchema = mongoose.Schema(
             default: false,
             required: true,
         },
-        creator: {
-            type: Schema.Types.ObjectId,
-            ref: "User",
-            required: true,
-        },
+        // creator: {
+        //     type: Schema.Types.ObjectId,
+        //     ref: "User",
+        //     required: true,
+        // },
     },
     { timestamps: true }
 );

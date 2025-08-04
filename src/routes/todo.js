@@ -1,45 +1,12 @@
 const { Router } = require("express");
+const { getTodos, createTodo, getTodo } = require("../controllers/todo");
 
 const todoRouter = Router();
 
-todoRouter.get("/", (req, res) => {
-    res.status(200).json({
-        todos: [
-            {
-                id: 1,
-                title: "Buy groceries",
-                description: "Milk, bread, eggs",
-                completed: false,
-                createdAt: "2024-08-02T10:30:00Z",
-                updatedAt: "2024-08-02T10:30:00Z",
-            },
-            {
-                id: 2,
-                title: "Buy phone",
-                description: "Buy a iphone 16 pro",
-                completed: false,
-                createdAt: "2024-08-02T10:30:00Z",
-                updatedAt: "2024-08-02T10:30:00Z",
-            },
-        ],
-    });
-});
+todoRouter.get("/", getTodos);
 
-todoRouter.get("/:id", (req, res) => {
-    const todoId = req.params.id;
+todoRouter.get("/:id", getTodo);
 
-    console.log(todoId);
-
-    res.status(200).json({
-        todos: {
-            id: 2,
-            title: "Buy phone",
-            description: "Buy a iphone 16 pro",
-            completed: false,
-            createdAt: "2024-08-02T10:30:00Z",
-            updatedAt: "2024-08-02T10:30:00Z",
-        },
-    });
-});
+todoRouter.post("/", createTodo);
 
 module.exports = todoRouter;
