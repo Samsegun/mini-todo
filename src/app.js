@@ -4,6 +4,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 const todoRoutes = require("./routes/todo");
+const authRoutes = require("./routes/auth");
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -14,6 +15,7 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome to TODO rest-api" });
 });
 app.use("/todos", todoRoutes);
+app.use("/auth", authRoutes);
 
 // error handler
 app.use((err, req, res, next) => {
