@@ -25,8 +25,10 @@ async function getTodo(req, res, next) {
             throw error;
         }
 
-        // todo: if entered todoId is not in user's todo list throw error
-        const todo = await Todos.findById(todoId);
+        const todo = await Todos.findOne(
+            { _id: todoId, creator: req.userId },
+            { __v: 0 }
+        );
 
         if (!todo) {
             const error = new Error("could not find todo");
@@ -44,6 +46,17 @@ async function getTodo(req, res, next) {
 
 async function createTodo(req, res, next) {
     try {
+        // return error if creator id does not match user id
+        // note: custom error handling does not work, yet to figure it out
+        if (req.validatedData.creator !== req.userId) {
+            // const error = new Error("Can't assign this todo to another user!");
+            // error.statusCode = 403;
+            // throw error;
+            return res.status(403).json({
+                message: "You can't assign this todo to another user.",
+            });
+        }
+
         const result = await Todos.create(req.validatedData);
 
         if (!result) {
@@ -53,9 +66,8 @@ async function createTodo(req, res, next) {
         }
 
         // update user todo array with newly created todo
-        const userId = req.userId;
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
+        const updatedUser = await User.findOneAndUpdate(
+            { _id: req.userId },
             { $push: { todos: result._id } },
             { new: true }
         ).select("_id email");
@@ -92,17 +104,27 @@ async function deleteTodo(req, res, next) {
             throw error;
         }
 
-        const todo = await Todos.findById(todoId);
+        const deletedTodo = await Todos.findOneAndDelete({
+            _id: todoId,
+            creator: req.userId,
+        });
 
-        if (!todo) {
-            const error = new Error("could not find todo");
+        if (!deletedTodo) {
+            const error = new Error("Todo not found or failed to delete");
             error.statusCode = 404;
             throw error;
         }
 
-        const result = await Todos.deleteOne({ _id: todoId });
+        // remove from user's todo array
+        await User.findByIdAndUpdate(
+            { _id: req.userId },
+            { $pull: { todos: todoId } }
+        );
 
-        res.status(200).json({ message: "todo deleted successful", result });
+        res.status(200).json({
+            message: "todo deleted successful",
+            deletedTodo,
+        });
     } catch (error) {
         next(error);
     }
