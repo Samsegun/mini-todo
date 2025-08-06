@@ -28,11 +28,9 @@ exports.createTodoSchema = z.object({
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
     completed: z.boolean().default(false),
-    creator: z
-        .string()
-        .refine(val => mongoose.Types.ObjectId.isValid(val), {
-            message: "Invalid id",
-        }),
+    creator: z.string().refine(val => mongoose.Types.ObjectId.isValid(val), {
+        message: "Invalid id",
+    }),
 });
 
 exports.createUserSchema = z.object({
@@ -86,4 +84,15 @@ exports.validate = schema => {
         req.validatedData = result.data;
         next();
     };
+};
+
+exports.validateUserAndCreator = (req, res, next) => {
+    // return error if creator id does not match user id
+    if (req.validatedData.creator !== req.userId) {
+        const error = new Error("Can't assign this todo to another user!");
+        error.statusCode = 403;
+        throw error;
+    }
+
+    next();
 };

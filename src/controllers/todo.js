@@ -46,17 +46,6 @@ async function getTodo(req, res, next) {
 
 async function createTodo(req, res, next) {
     try {
-        // return error if creator id does not match user id
-        // note: custom error handling does not work, yet to figure it out
-        if (req.validatedData.creator !== req.userId) {
-            // const error = new Error("Can't assign this todo to another user!");
-            // error.statusCode = 403;
-            // throw error;
-            return res.status(403).json({
-                message: "You can't assign this todo to another user.",
-            });
-        }
-
         const result = await Todos.create(req.validatedData);
 
         if (!result) {
@@ -82,7 +71,7 @@ async function createTodo(req, res, next) {
         const { _id, title, completed, creator } = result;
 
         res.status(201).json({
-            message: "todo created successful",
+            message: "todo created!",
             todo: { _id, title, completed, creator },
             user: {
                 _id: updatedUser._id,
@@ -93,6 +82,8 @@ async function createTodo(req, res, next) {
         next();
     }
 }
+
+async function updateTodo(req, res, next) {}
 
 async function deleteTodo(req, res, next) {
     const todoId = req.params.id;
@@ -134,5 +125,6 @@ module.exports = {
     getTodos,
     getTodo,
     createTodo,
+    updateTodo,
     deleteTodo,
 };

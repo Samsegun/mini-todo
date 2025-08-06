@@ -86,7 +86,6 @@ async function logIn(req, res, next) {
             _id: result._id,
             email: result.email,
             username: result.username,
-            todos: result.todo,
         };
 
         res.status(200).json({
