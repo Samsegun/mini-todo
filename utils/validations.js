@@ -1,11 +1,23 @@
 const mongoose = require("mongoose");
 const { z } = require("zod");
+const jwt = require("jsonwebtoken");
 
 exports.mongoIdValidation = id => {
     return mongoose.Types.ObjectId.isValid(id);
 };
 
-// Usage
+exports.generateToken = user => {
+    return jwt.sign(
+        {
+            email: user.email,
+            userId: user._id.toString(),
+        },
+        process.env.JWT_KEY,
+        { expiresIn: "2 days" }
+    );
+};
+
+// validations
 exports.createTodoSchema = z.object({
     title: z
         .string()
@@ -16,9 +28,11 @@ exports.createTodoSchema = z.object({
         .max(1000, "Description must be less than 1000 characters")
         .optional(),
     completed: z.boolean().default(false),
-    // creator: z
-    //     .string()
-    //     .refine(val => mongoIdValidation(val), { message: "Invalid id" }),
+    creator: z
+        .string()
+        .refine(val => mongoose.Types.ObjectId.isValid(val), {
+            message: "Invalid id",
+        }),
 });
 
 exports.createUserSchema = z.object({
@@ -28,22 +42,32 @@ exports.createUserSchema = z.object({
         .string()
         .min(3, "Username must be at least 3 characters")
         .max(20, "Name must be less than 20 characters"),
-    // creator: z
-    //     .string()
-    //     .refine(val => mongoIdValidation(val), { message: "Invalid id" }),
+    todos: z
+        .array(
+            z.string().refine(val => mongoose.Types.ObjectId.isValid(val), {
+                message: "Invalid todo ID",
+            })
+        )
+        .optional()
+        .default([]),
 });
 
-exports.signInUserSchema = z.object({
-    email: z.email("Invalid email format").optional(),
-    username: z
-        .string()
-        .min(3, "Username must be at least 3 characters")
-        .max(20, "Name must be less than 20 characters")
-        .optional(),
-    password: z.string(),
-});
+exports.signInUserSchema = z
+    .object({
+        email: z.email("Invalid email format").optional(),
+        username: z
+            .string()
+            .min(3, "Username must be at least 3 characters")
+            .max(20, "Name must be less than 20 characters")
+            .optional(),
+        password: z.string(),
+    })
+    .refine(data => data.email || data.username, {
+        message: "Either email or username is required",
+        path: ["email"],
+    });
 
-// Validation middleware
+// validation middleware
 exports.validate = schema => {
     return (req, res, next) => {
         const result = schema.safeParse(req.body);

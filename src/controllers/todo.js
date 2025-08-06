@@ -1,9 +1,10 @@
 const Todos = require("../models/todo");
 const { mongoIdValidation } = require("../../utils/validations.js");
+const User = require("../models/user");
 
 async function getTodos(req, res, next) {
     try {
-        const todos = await Todos.find();
+        const todos = await Todos.find({ creator: req.userId }, { __v: 0 });
 
         res.status(200).json({
             message: "todos fetched successful",
@@ -24,6 +25,7 @@ async function getTodo(req, res, next) {
             throw error;
         }
 
+        // todo: if entered todoId is not in user's todo list throw error
         const todo = await Todos.findById(todoId);
 
         if (!todo) {
@@ -50,9 +52,30 @@ async function createTodo(req, res, next) {
             throw error;
         }
 
+        // update user todo array with newly created todo
+        const userId = req.userId;
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $push: { todos: result._id } },
+            { new: true }
+        ).select("_id email");
+
+        // if user update fails, delete the created todo
+        if (!updatedUser) {
+            await Todos.findByIdAndDelete(result._id);
+            const error = new Error("Failed to update user with new todo");
+            throw error;
+        }
+
+        const { _id, title, completed, creator } = result;
+
         res.status(201).json({
             message: "todo created successful",
-            todo: result,
+            todo: { _id, title, completed, creator },
+            user: {
+                _id: updatedUser._id,
+                email: updatedUser.email,
+            },
         });
     } catch (error) {
         next();

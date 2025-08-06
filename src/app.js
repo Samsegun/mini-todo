@@ -5,6 +5,7 @@ const morgan = require("morgan");
 
 const todoRoutes = require("./routes/todo");
 const authRoutes = require("./routes/auth");
+const protected = require("./middleware/auth");
 
 app.use(cors());
 app.use(morgan("combined"));
@@ -14,7 +15,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
     res.json({ message: "Welcome to TODO rest-api" });
 });
-app.use("/todos", todoRoutes);
+app.use("/todos", protected, todoRoutes);
 app.use("/auth", authRoutes);
 
 // error handler
