@@ -83,7 +83,49 @@ async function createTodo(req, res, next) {
     }
 }
 
-async function updateTodo(req, res, next) {}
+async function updateTodo(req, res, next) {
+    const todoId = req.params.id;
+
+    try {
+        if (!mongoIdValidation(todoId)) {
+            const error = new Error("Invalid todo ID");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        //fetch post
+        let todo = await Todos.findById(todoId);
+        if (!todo) {
+            const error = new Error("Could not find todo");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        // compare creator id with logged in user
+        if (todo.creator.toString() !== req.userId) {
+            const error = new Error("Can't update todo for another user");
+            error.statusCode = 403;
+            throw error;
+        }
+
+        // update todo
+        Object.assign(todo, req.validatedData);
+
+        const updatedTodo = await todo.save();
+
+        if (!updatedTodo) {
+            const error = new Error("Failed to update todo");
+            throw error;
+        }
+
+        res.status(200).json({
+            message: "todo updated successful",
+            updatedTodo,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
 
 async function deleteTodo(req, res, next) {
     const todoId = req.params.id;
@@ -108,6 +150,7 @@ async function deleteTodo(req, res, next) {
             throw error;
         }
 
+        // to be refactored; no need finding todo at this point. Just delete!
         const deletedTodo = await Todos.findByIdAndDelete(todoId);
         if (!deletedTodo) {
             const error = new Error("Failed to delete");

@@ -33,6 +33,21 @@ exports.createTodoSchema = z.object({
     }),
 });
 
+exports.updateTodoSchema = z.object({
+    title: z
+        .string()
+        .min(3, "Title must be at least 3 characters")
+        .max(100, "Title must be less than 100 characters")
+        .optional(),
+
+    description: z
+        .string()
+        .max(1000, "Description must be less than 1000 characters")
+        .optional(),
+
+    completed: z.boolean().optional(),
+});
+
 exports.createUserSchema = z.object({
     email: z.email("Invalid email format"),
     password: z.string(),
@@ -86,7 +101,8 @@ exports.validate = schema => {
     };
 };
 
-exports.validateUserAndCreator = (req, res, next) => {
+// for todo creation
+exports.validateUserIdAndCreatorId = (req, res, next) => {
     // throw error if creator id does not match user id
     if (req.validatedData.creator !== req.userId) {
         const error = new Error("Can't assign this todo to another user!");

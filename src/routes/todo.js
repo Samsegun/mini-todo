@@ -9,7 +9,9 @@ const {
 const {
     validate,
     createTodoSchema,
-    validateUserAndCreator,
+
+    updateTodoSchema,
+    validateUserIdAndCreatorId,
 } = require("../../utils/validations.js");
 
 const todoRouter = Router();
@@ -21,16 +23,11 @@ todoRouter.get("/:id", getTodo);
 todoRouter.post(
     "/",
     validate(createTodoSchema),
-    validateUserAndCreator,
+    validateUserIdAndCreatorId,
     createTodo
 );
 
-todoRouter.put(
-    "/:id",
-    validate(createTodoSchema),
-    validateUserAndCreator,
-    updateTodo
-);
+todoRouter.put("/:id", validate(updateTodoSchema), updateTodo);
 
 todoRouter.delete("/:id", deleteTodo);
 
