@@ -150,9 +150,8 @@ async function deleteTodo(req, res, next) {
             throw error;
         }
 
-        // to be refactored; no need finding todo at this point. Just delete!
-        const deletedTodo = await Todos.findByIdAndDelete(todoId);
-        if (!deletedTodo) {
+        const deletedResult = await Todos.deleteOne({ _id: todoId });
+        if (!deletedResult.acknowledged) {
             const error = new Error("Failed to delete");
             throw error;
         }
@@ -165,7 +164,7 @@ async function deleteTodo(req, res, next) {
 
         res.status(200).json({
             message: "todo deleted successful",
-            deletedTodo,
+            deletedResult,
         });
     } catch (error) {
         next(error);
