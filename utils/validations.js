@@ -87,7 +87,7 @@ exports.validate = schema => {
 };
 
 exports.validateUserAndCreator = (req, res, next) => {
-    // return error if creator id does not match user id
+    // throw error if creator id does not match user id
     if (req.validatedData.creator !== req.userId) {
         const error = new Error("Can't assign this todo to another user!");
         error.statusCode = 403;

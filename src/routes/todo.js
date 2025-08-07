@@ -25,7 +25,12 @@ todoRouter.post(
     createTodo
 );
 
-todoRouter.put("/:id", validate(createTodoSchema), updateTodo);
+todoRouter.put(
+    "/:id",
+    validate(createTodoSchema),
+    validateUserAndCreator,
+    updateTodo
+);
 
 todoRouter.delete("/:id", deleteTodo);
 

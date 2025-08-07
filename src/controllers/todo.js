@@ -95,14 +95,22 @@ async function deleteTodo(req, res, next) {
             throw error;
         }
 
-        const deletedTodo = await Todos.findOneAndDelete({
-            _id: todoId,
-            creator: req.userId,
-        });
-
-        if (!deletedTodo) {
-            const error = new Error("Todo not found or failed to delete");
+        const todoToBeRemoved = await Todos.findById(todoId);
+        if (!todoToBeRemoved) {
+            const error = new Error("Could not find todo");
             error.statusCode = 404;
+            throw error;
+        }
+
+        if (todoToBeRemoved.creator.toString() !== req.userId) {
+            const error = new Error("Can't delete todo for another user");
+            error.statusCode = 403;
+            throw error;
+        }
+
+        const deletedTodo = await Todos.findByIdAndDelete(todoId);
+        if (!deletedTodo) {
+            const error = new Error("Failed to delete");
             throw error;
         }
 
