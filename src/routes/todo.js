@@ -12,7 +12,7 @@ const {
 
     updateTodoSchema,
     validateUserIdAndCreatorId,
-} = require("../../utils/validations.js");
+} = require("../utils/validations");
 
 const todoRouter = Router();
 

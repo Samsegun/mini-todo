@@ -3,7 +3,7 @@ const {
     validate,
     createUserSchema,
     signInUserSchema,
-} = require("../../utils/validations");
+} = require("../utils/validations");
 const { signUp, logIn } = require("../controllers/auth");
 
 const authRouter = Router();

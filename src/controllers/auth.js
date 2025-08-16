@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-const { generateToken } = require("../../utils/validations");
+const { generateToken } = require("../utils/validations");
 
 async function signUp(req, res, next) {
     try {
@@ -36,7 +36,6 @@ async function signUp(req, res, next) {
             _id: result._id,
             email: result.email,
             username: result.username,
-            todos: result.todo,
             createdAt: result.createdAt,
         };
 

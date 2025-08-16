@@ -54,7 +54,7 @@ exports.createUserSchema = z.object({
     username: z
         .string()
         .min(3, "Username must be at least 3 characters")
-        .max(20, "Name must be less than 20 characters"),
+        .max(20, "Username must be less than 20 characters"),
     todos: z
         .array(
             z.string().refine(val => mongoose.Types.ObjectId.isValid(val), {
@@ -71,7 +71,7 @@ exports.signInUserSchema = z
         username: z
             .string()
             .min(3, "Username must be at least 3 characters")
-            .max(20, "Name must be less than 20 characters")
+            .max(20, "Username must be less than 20 characters")
             .optional(),
         password: z.string(),
     })

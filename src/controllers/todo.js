@@ -1,5 +1,5 @@
 const Todos = require("../models/todo");
-const { mongoIdValidation } = require("../../utils/validations.js");
+const { mongoIdValidation } = require("../utils/validations.js");
 const User = require("../models/user");
 
 async function getTodos(req, res, next) {
@@ -68,15 +68,11 @@ async function createTodo(req, res, next) {
             throw error;
         }
 
-        const { _id, title, completed, creator } = result;
+        const { _id, title, description, completed, creator } = result;
 
         res.status(201).json({
             message: "todo created!",
-            todo: { _id, title, completed, creator },
-            user: {
-                _id: updatedUser._id,
-                email: updatedUser.email,
-            },
+            todo: { _id, title, description, completed, creator },
         });
     } catch (error) {
         next();
@@ -118,9 +114,27 @@ async function updateTodo(req, res, next) {
             throw error;
         }
 
+        const {
+            _id,
+            title,
+            description,
+            completed,
+            creator,
+            createdAt,
+            updatedAt,
+        } = updatedTodo;
+
         res.status(200).json({
             message: "todo updated successful",
-            updatedTodo,
+            updatedTodo: {
+                _id,
+                title,
+                description,
+                completed,
+                creator,
+                createdAt,
+                updatedAt,
+            },
         });
     } catch (error) {
         next(error);
