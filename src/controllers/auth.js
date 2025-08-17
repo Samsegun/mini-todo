@@ -61,7 +61,6 @@ async function logIn(req, res, next) {
             ],
         });
 
-        // i used 400(bad request) statusCode so an attacker won't have an hint if email, username or password is valid
         if (!result) {
             const error = new Error(
                 "Invalid credentials. Login details is incorrect!"
