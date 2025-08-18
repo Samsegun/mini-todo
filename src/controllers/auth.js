@@ -51,14 +51,10 @@ async function signUp(req, res, next) {
 
 async function logIn(req, res, next) {
     try {
-        const { email, username, password } = req.validatedData;
+        const { emailUsername, password } = req.validatedData;
 
-        // find user by email or username
         const result = await User.findOne({
-            $or: [
-                ...(email ? [{ email }] : []),
-                ...(username ? [{ username }] : []),
-            ],
+            $or: [{ email: emailUsername }, { username: emailUsername }],
         });
 
         if (!result) {

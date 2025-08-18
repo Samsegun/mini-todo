@@ -17,6 +17,13 @@ module.exports = (req, res, next) => {
             throw error;
         }
 
+        // const isDenied = await denylist.has(token);
+        // if (isDenied) {
+        //     const error = new Error("Token has been invalidated!");
+        //     error.statusCode = 401;
+        //     throw error;
+        // }
+
         const user = jwt.verify(token, process.env.JWT_KEY);
         req.userId = user.userId;
 

@@ -67,18 +67,17 @@ exports.createUserSchema = z.object({
 
 exports.signInUserSchema = z
     .object({
-        email: z.email("Invalid email format").optional(),
-        username: z
-            .string()
-            .min(3, "Username must be at least 3 characters")
-            .max(20, "Username must be less than 20 characters")
-            .optional(),
+        emailUsername: z.string(),
         password: z.string(),
     })
-    .refine(data => data.email || data.username, {
+    .refine(data => data.emailUsername, {
         message: "Either email or username is required",
         path: ["email"],
     });
+// .refine(data => data.email || data.username, {
+//     message: "Either email or username is required",
+//     path: ["email"],
+// })
 
 // validation middleware
 exports.validate = schema => {
