@@ -59,7 +59,7 @@ async function logIn(req, res, next) {
 
         if (!result) {
             const error = new Error(
-                "Invalid credentials. Login details is incorrect!"
+                "Invalid credentials. Please check login details!"
             );
             error.statusCode = 400;
             throw error;
@@ -69,7 +69,7 @@ async function logIn(req, res, next) {
         const isEqual = await bcrypt.compare(password, result.password);
         if (!isEqual) {
             const error = new Error(
-                "Invalid credentials. Login details is incorrect!"
+                "Invalid credentials. Please check login details!"
             );
             error.statusCode = 400;
             throw error;
