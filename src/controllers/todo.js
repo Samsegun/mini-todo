@@ -4,7 +4,16 @@ const User = require("../models/user");
 
 async function getTodos(req, res, next) {
     try {
-        const todos = await Todos.find({ creator: req.userId }, { __v: 0 });
+        const status = req.query.status || "all";
+        let query = { creator: req.userId };
+
+        if (status === "active") {
+            query.completed = false;
+        } else if (status === "completed") {
+            query.completed = true;
+        }
+
+        const todos = await Todos.find(query, { __v: 0 });
 
         res.status(200).json({
             message: "todos fetched successful",
