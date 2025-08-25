@@ -2,7 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/user");
-const { generateToken } = require("../utils/validations");
+const { generateToken, mongoIdValidation } = require("../utils/validations");
 
 async function signUp(req, res, next) {
     try {
@@ -92,7 +92,58 @@ async function logIn(req, res, next) {
     }
 }
 
+async function updateUser(req, res, next) {
+    const userId = req.params.userId;
+
+    try {
+        if (!mongoIdValidation(userId)) {
+            const error = new Error("Invalid user ID");
+            error.statusCode = 400;
+            throw error;
+        }
+
+        //fetch user
+        let user = await User.findById(userId);
+        if (!user) {
+            const error = new Error("Could not find user");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        // compare user id with logged in user
+        if (user._id.toString() !== req.userId) {
+            const error = new Error("Can't update user!!!");
+            error.statusCode = 403;
+            throw error;
+        }
+
+        // update todo
+        Object.assign(user, req.validatedData);
+
+        const updatedUser = await user.save();
+
+        if (!updatedUser) {
+            const error = new Error("Failed to update user");
+            throw error;
+        }
+
+        const { _id, email, username, updatedAt } = updatedUser;
+
+        res.status(200).json({
+            message: "user updated successful",
+            updatedUser: {
+                _id,
+                email,
+                username,
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
 module.exports = {
     signUp,
     logIn,
+    updateUser,
 };

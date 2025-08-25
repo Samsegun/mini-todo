@@ -74,10 +74,15 @@ exports.signInUserSchema = z
         message: "Either email or username is required",
         path: ["email"],
     });
-// .refine(data => data.email || data.username, {
-//     message: "Either email or username is required",
-//     path: ["email"],
-// })
+
+exports.updateUserSchema = z.object({
+    username: z
+        .string()
+        .min(3, "Username must be at least 3 characters")
+        .max(20, "Username must be less than 20 characters")
+        .optional(),
+    password: z.string().optional(),
+});
 
 // validation middleware
 exports.validate = schema => {

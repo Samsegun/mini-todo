@@ -13,7 +13,9 @@ async function getTodos(req, res, next) {
             query.completed = true;
         }
 
-        const todos = await Todos.find(query, { __v: 0 });
+        const todos = await Todos.find(query, { __v: 0 }).sort({
+            createdAt: -1,
+        });
 
         res.status(200).json({
             message: "todos fetched successful",
